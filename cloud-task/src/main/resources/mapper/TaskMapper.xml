@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.newtranx.task.mapper.TaskMapper">
+   <sql id="Base_Column_List">
+	t.task_id,
+	t.project_id,
+	t.file_id,
+	t.user_id,
+	t.type,
+	t.due_time,
+	t.STATUS,
+	t.progress,
+	t.handled_count,
+	t.tatal_count,
+	t.create_time,
+	t.update_time,
+	t.is_del,
+	tm.team_name,
+	pf.file_name,
+	p.NAME,
+	p.team_id,
+	p.src_lang,
+	p.tgt_lang
+    </sql>
+   <!--任务表名 -->
+   <sql id="tableName">
+		task
+	</sql>
+
+   <!--项目文件表 -->
+   <sql id="projectFileTableName">
+		project_file
+	</sql>
+   <!--项目表 -->
+   <sql id="projectTableName">
+		project
+	</sql>
+   <!--团队表 -->
+   <sql id="teamTableName">
+		team
+	</sql>
+   <select id="listByQuery" resultType="com.newtranx.task.dto.TaskR">
+      SELECT
+      <include refid="Base_Column_List"/>
+      FROM
+      <include refid="tableName"/> t
+	   left JOIN <include refid="projectFileTableName"/> pf ON t.file_id = pf.file_id
+	   left JOIN <include refid="projectTableName"/> p ON t.project_id = p.project_id
+	   left JOIN <include refid="teamTableName"/> tm ON p.team_id = tm.id
+      ${ew.customSqlSegment}
+   </select>
+	<select id="getAllInfo" resultType="com.newtranx.task.dto.TaskR">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM
+		<include refid="tableName"/> t
+		left JOIN <include refid="projectFileTableName"/> pf ON t.file_id = pf.file_id
+		left JOIN <include refid="projectTableName"/> p ON t.project_id = p.project_id
+		left JOIN <include refid="teamTableName"/> tm ON p.team_id = tm.id
+		${ew.customSqlSegment}
+	</select>
+</mapper>

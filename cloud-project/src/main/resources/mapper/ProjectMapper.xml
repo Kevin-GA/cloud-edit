@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.newtranx.cloud.edit.dao.ProjectDao">
+
+    <resultMap id="BaseResultMap" type="com.newtranx.cloud.edit.entities.Project">
+        <id column="project_id" property="projectId" />
+        <id column="name" property="name" />
+        <id column="src_lang" property="srcLang" />
+        <id column="tgt_lang" property="tgtLang" />
+        <id column="field" property="field" />
+        <id column="due_time" property="dueTime" />
+        <id column="progress" property="progress" />
+        <id column="remark" property="remark" />
+        <id column="team_id" property="teamId" />
+        <id column="create_by" property="createBy" />
+        <id column="create_time" property="createTime" />
+        <id column="update_time" property="updateTime" />
+        <id column="is_del" property="isDel" />
+    </resultMap>
+
+    <sql id="tableName">`project`</sql>
+
+    <insert id="create" parameterType="com.newtranx.cloud.edit.entities.Project" useGeneratedKeys="true" keyProperty="projectId">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.projectId != null">`project_id`,</if>
+            <if test="entity.name != null">`name`,</if>
+            <if test="entity.srcLang != null">`src_lang`,</if>
+            <if test="entity.tgtLang != null">`tgt_lang`,</if>
+            <if test="entity.field != null">`field`,</if>
+            <if test="entity.dueTime != null">`due_time`,</if>
+            <if test="entity.progress != null">`progress`,</if>
+            <if test="entity.remark != null">`remark`,</if>
+            <if test="entity.teamId != null">`team_id`,</if>
+            <if test="entity.createBy != null">`create_by`,</if>
+            <if test="entity.createTime != null">`create_time`,</if>
+            <if test="entity.updateTime != null">`update_time`,</if>
+            <if test="entity.isDel != null">`is_del`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.projectId != null">#{entity.projectId},</if>
+            <if test="entity.name != null">#{entity.name},</if>
+            <if test="entity.srcLang != null">#{entity.srcLang},</if>
+            <if test="entity.tgtLang != null">#{entity.tgtLang},</if>
+            <if test="entity.field != null">#{entity.field},</if>
+            <if test="entity.dueTime != null">#{entity.dueTime},</if>
+            <if test="entity.progress != null">#{entity.progress},</if>
+            <if test="entity.remark != null">#{entity.remark},</if>
+            <if test="entity.teamId != null">#{entity.teamId},</if>
+            <if test="entity.createBy != null">#{entity.createBy},</if>
+            <if test="entity.createTime != null">#{entity.createTime},</if>
+            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+            <if test="entity.isDel != null">#{entity.isDel},</if>
+        </trim>
+    </insert>
+
+    <select id="getProjectById" parameterType="Long" resultMap="BaseResultMap">
+        select * from project where project_id=#{projectId};
+    </select>
+
+<!--    获取未删除项目列表-->
+    <select id="getList" parameterType="com.newtranx.cloud.edit.entities.Project" resultMap="BaseResultMap">
+        select * from project where isdel=0;
+    </select>
+
+<!--    假删项目-->
+    <update id="isdelByProjectId">
+        update project set is_del=1 where project_id=#{projectId};
+    </update>
+
+    <!-- 根据project_id查询用户-->
+    <select id="getUsers" parameterType="long" resultType="string">
+        select u.username username
+        from user u
+        where user_id
+        in (
+            select t.user_id from task t where project_id = #{projectId}
+        );
+    </select>
+
+
+    <update id="update">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.name != null">
+                `name` = #{entity.name},
+            </if>
+            <if test="entity.srcLang != null">
+                `src_lang` = #{entity.srcLang},
+            </if>
+            <if test="entity.tgtLang != null">
+                `tgt_lang`= #{entity.tgtLang},
+            </if>
+            <if test="entity.field != null">
+                `field` = #{entity.field},
+            </if>
+            <if test="entity.dueTime != null">
+                `due_time` = #{entity.dueTime},
+            </if>
+            <if test="entity.progress != null">
+                `progress` = #{entity.progress},
+            </if>
+            <if test="entity.remark != null">
+                `remark` = #{entity.remark},
+            </if>
+            <if test="entity.teamId != null">
+                `team_id` = #{entity.teamId},
+            </if>
+            <if test="entity.createBy != null">
+                `create_by` = #{entity.createBy},
+            </if>
+            <if test="entity.createTime != null">
+                `create_time` = #{entity.createTime},
+            </if>
+            <if test="entity.updateTime != null">
+                `updat_time` = #{entity.updateTime},
+            </if>
+            <if test="entity.isDel != null">
+               `is_del` = #{entity.isDel},
+            </if>
+        </set>
+        where project_id = #{entity.projectId};
+    </update>
+</mapper>
+
+

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.newtranx.cloud.edit.dao.ProjectFileDao">
+
+    <resultMap id="BaseResultMap" type="com.newtranx.cloud.edit.entities.ProjectFile">
+        <id column="file_id" property="fileId" />
+        <id column="project_id" property="projectId" />
+        <id column="user_id" property="userId" />
+        <id column="file_name" property="fileName" />
+        <id column="file_path" property="filePath" />
+        <id column="file_ext" property="fileExt" />
+        <id column="file_size" property="fileSize" />
+        <id column="middle_file" property="middleFile" />
+        <id column="src_xlf_path" property="srcXlfPath" />
+        <id column="tgt_xlf_path" property="tgtXlfPath" />
+        <id column="proofread_path" property="proofreadPath" />
+        <id column="edit_path" property="editPath" />
+        <id column="ft_path" property="ftPath" />
+        <id column="bilingual_path" property="bilingualPath" />
+        <id column="tgt_path" property="tgtPath" />
+        <id column="total" property="total" />
+        <id column="translated_count" property="translatedCount" />
+        <id column="create_time" property="createTime" />
+        <id column="update_time" property="updateTime" />
+        <id column="is_del" property="isDel" />
+        <id column="status" property="status" />
+    </resultMap>
+
+    <sql id="tableName">`project_file`</sql>
+
+    <!--    记录上传的文件-->
+    <insert id="create" parameterType="com.newtranx.cloud.edit.entities.ProjectFile" useGeneratedKeys="true" keyProperty="fileId">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <!-- <if test="entity.fileId != null">`file_id`,</if> -->
+            <if test="entity.projectId != null">`project_id`,</if>
+            <if test="entity.userId != null">`user_id`,</if>
+            <if test="entity.fileName != null">`file_name`,</if>
+            <if test="entity.filePath != null">`file_path`,</if>
+            <if test="entity.fileExt != null">`file_ext`,</if>
+            <if test="entity.fileSize != null">`file_size`,</if>
+            <if test="entity.middleFile != null">`middle_file`,</if>
+            <if test="entity.srcXlfPath != null">`src_xlf_path`,</if>
+            <if test="entity.tgtXlfPath != null">`tgt_xlf_path`,</if>
+            <if test="entity.tgtPath != null">`tgt_path`,</if>
+            <if test="entity.proofreadPath != null">`proofread_path`,</if>
+            <if test="entity.editPath != null">`edit_path`,</if>
+            <if test="entity.ftPath != null">`ft_path`,</if>
+            <if test="entity.bilingualPath != null">`bilingual_path`,</if>
+            <if test="entity.total != null">`total`,</if>
+            <if test="entity.translatedCount != null">`translated_count`,</if>
+            <if test="entity.createTime != null">`create_time`,</if>
+            <if test="entity.updateTime != null">`update_time`,</if>
+            <if test="entity.isDel != null">`is_del`,</if>
+            <if test="entity.status != null">`status`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <!-- <if test="entity.fileId != null">#{entity.fileId},</if> -->
+            <if test="entity.projectId != null">#{entity.projectId},</if>
+            <if test="entity.userId != null">#{entity.userId},</if>
+            <if test="entity.fileName != null">#{entity.fileName},</if>
+            <if test="entity.filePath != null">#{entity.filePath},</if>
+            <if test="entity.fileExt != null">#{entity.fileExt},</if>
+            <if test="entity.fileSize != null">#{entity.fileSize},</if>
+            <if test="entity.middleFile != null">#{entity.middleFile},</if>
+            <if test="entity.srcXlfPath != null">#{entity.srcXlfPath},</if>
+            <if test="entity.tgtXlfPath != null">#{entity.tgtXlfPath},</if>
+            <if test="entity.tgtPath != null">#{entity.tgtPath},</if>
+            <if test="entity.proofreadPath != null">#{entity.proofreadPath},</if>
+            <if test="entity.editPath != null">#{entity.editPath},</if>
+            <if test="entity.ftPath != null">#{entity.ftPath},</if>
+            <if test="entity.bilingualPath != null">#{entity.bilingualPath},</if>
+            <if test="entity.total != null">#{entity.total},</if>
+            <if test="entity.translatedCount != null">#{entity.translatedCount},</if>
+            <if test="entity.createTime != null">#{entity.createTime},</if>
+            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+            <if test="entity.isDel != null">#{entity.isDel},</if>
+            <if test="entity.status != null">#{entity.status},</if>
+        </trim>
+    </insert>
+
+
+    <!--根据项目ID查询关联文件-->
+    <select id="getListByProjectId" parameterType="long" resultMap="BaseResultMap">
+        select * from project_file
+        where is_del=0
+        and total != 0
+        and project_id=#{projectId}
+    </select>
+
+    <!--获取未分配的文件-->
+    <select id="getUnassignFilesByProjectId" parameterType="long" resultMap="BaseResultMap">
+        select * from project_file pf where pf.is_del=0 and pf.file_id in(
+            select t.file_id from task t where
+            t.status != 2
+            and t.is_del=0
+            and t.project_id=#{projectId}
+        )
+    </select>
+    <!--只获取编辑和校对的文件-->
+    <select id="getEditAndCheckFilesByProjectId" parameterType="long" resultMap="BaseResultMap">
+       select * from project_file pf where pf.is_del=0 and pf.file_id in(
+            select distinct(t.file_id) from task t where
+            (t.type = 2 or t.type =3)
+            and t.project_id=#{projectId}
+        )
+    </select>
+
+    <!--    更新文件信息-->
+    <update id="update">
+        UPDATE <include refid="tableName"/>
+        <set>
+<!--            <if test="entity.fileId != null">-->
+<!--                `file_id` = #{entity.fileId},-->
+<!--            </if>-->
+            <if test="entity.projectId != null">
+                `project_id` = #{entity.projectId},</if>
+            <if test="entity.userId != null">
+                `user_id` = #{entity.userId},
+            </if>
+            <if test="entity.fileName != null">
+                `file_name` = #{entity.fileName},
+            </if>
+            <if test="entity.filePath != null">
+                `file_path` = #{entity.filePath},
+            </if>
+            <if test="entity.fileExt != null">
+                `file_ext` = #{entity.fileExt},
+            </if>
+            <if test="entity.fileSize != null">
+                `file_size` = #{entity.fileSize},
+            </if>
+            <if test="entity.middleFile != null">
+                `middle_file` = #{entity.middleFile},
+            </if>
+            <if test="entity.srcXlfPath != null">
+                `src_xlf_path` = #{entity.srcXlfPath},
+            </if>
+            <if test="entity.tgtXlfPath != null">
+                `tgt_xlf_path` = #{entity.tgtXlfPath},
+            </if>
+            <if test="entity.tgtPath != null">
+                `tgt_path` = #{entity.tgtPath},
+            </if>
+            <if test="entity.proofreadPath != null">
+                `proofread_path` = #{entity.proofreadPath},
+            </if>
+            <if test="entity.editPath != null">
+                `edit_path` = #{entity.editPath},
+            </if>
+            <if test="entity.ftPath != null">
+                `ft_path` = #{entity.ftPath},
+            </if>
+            <if test="entity.bilingualPath != null">
+                `bilingual_path` = #{entity.bilingualPath},
+            </if>
+            <if test="entity.total != null">
+                `total` = #{entity.total},
+            </if>
+            <if test="entity.translatedCount != null">
+                `translated_count` = #{entity.translatedCount},
+            </if>
+            <if test="entity.createTime != null">
+                `create_time` = #{entity.createTime},
+            </if>
+            <if test="entity.updateTime != null">
+                `update_time` = #{entity.updateTime},
+            </if>
+            <if test="entity.isDel != null">
+                `is_del` = #{entity.isDel},
+            </if>
+            <if test="entity.status != null">
+                `status` = #{entity.status},
+            </if>
+        </set>
+        where `file_id` = #{entity.fileId};
+    </update>
+
+
+    <!--    过滤项目下不包括的多个文件ID并且未拆分的文件-->
+    <select id="getFilesByProjectIdNotInFileIds" resultType="com.newtranx.cloud.edit.entities.ProjectFile">
+        select * from <include refid="tableName"/>
+        where is_del = 0
+        and total != 0
+        and project_id=#{projectId}
+        and file_id  not in
+        <foreach collection="list" item="item"  open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+</mapper>
+
+

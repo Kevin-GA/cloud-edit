@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.newtranx.cloud.edit.dao.ProjectProcessDao">
+
+    <resultMap id="BaseResultMap" type="com.newtranx.cloud.edit.entities.ProjectProcess">
+        <id column="process_id" property="processId" />
+        <id column="project_id" property="projectId" />
+        <id column="type" property="type" />
+        <id column="status" property="status" />
+        <id column="progress" property="progress" />
+        <id column="create_time" property="createTime" />
+        <id column="update_time" property="updateTime" />
+        <id column="is_del" property="isDel" />
+    </resultMap>
+
+    <sql id="tableName">`project_process`</sql>
+
+    <!--根据项目ID查询进度-->
+    <select id="getListByProjectId" parameterType="long" resultMap="BaseResultMap">
+        select * from project_process where project_id=#{projectId} and is_del=0
+    </select>
+
+    <update id="update">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.taskId != null">
+                `task_id` = #{entity.taskId},
+            </if>
+            <if test="entity.projectId != null">
+                `project_id` = #{entity.projectId},
+            </if>
+            <if test="entity.fileId != null">
+                `file_id` = #{entity.fileId},
+            </if>
+            <if test="entity.userId != null">
+                `user_id` = #{entity.createTime},
+            </if>
+            <if test="entity.type != null">
+                `type` = #{entity.createTime},
+            </if>
+            <if test="entity.dueTime != null">
+                `due_time` = #{entity.createTime},
+            </if>
+            <if test="entity.status != null">
+                `status` = #{entity.createTime},
+            </if>
+            <if test="entity.progress != null">
+                `progress` = #{entity.createTime},
+            </if>
+            <if test="entity.handledCount != null">
+                `handled_count` = #{entity.createTime},
+            </if>
+            <if test="entity.tatalCount != null">
+                `tatal_count` = #{entity.createTime},
+            </if>
+            <if test="entity.createTime != null">
+                `create_time` = #{entity.createTime},
+            </if>
+            <if test="entity.updateTime != null">
+                `updat_time` = #{entity.updateTime},
+            </if>
+            <if test="entity.isDel != null">
+                `is_del` = #{entity.isDel},
+            </if>
+        </set>
+        where `task_id` = #{entity.taskId};
+    </update>
+
+</mapper>
+
+

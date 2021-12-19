@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.newtranx.cloud.edit.dao.TaskMapper">
+
+    <resultMap id="userTaskList" type="com.newtranx.cloud.edit.dto.UserTaskListDto">
+        <result column="task_id" property="taskId"/>
+        <result column="project_id" property="projectId"/>
+        <result column="file_id" property="fileId"/>
+        <result column="user_id" property="userId" />
+        <result column="type" property="type" />
+        <result column="due_time" property="dueTime"/>
+        <result column="status" property="status"/>
+        <result column="progress" property="progress"/>
+        <result column="handled_count" property="handledCount"/>
+        <result column="tatal_count" property="tatalCount"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_del" property="isDel"/>
+        <result column="name" property="name"/>
+        <result column="file_path" property="filePath"/>
+        <result column="file_name" property="fileName"/>
+
+    </resultMap>
+
+    <select id="getUserTaskList" resultMap="userTaskList">
+        select a.*,b.name,c.file_path,c.file_name from task a LEFT JOIN project b ON a.project_id = b.project_id
+        LEFT JOIN project_file c on a.project_id = c.project_id
+        <where>1=1</where>
+        and a.is_del = 0
+
+        <if test="userId != null">
+            and a.user_id = #{userId}
+        </if>
+        <if test="userIds != null">
+            and a.user_id in (#{userIds})
+        </if>
+        <if test="status != null">
+            and a.`status` = #{status}
+        </if>
+        order by a.create_time desc
+        limit ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <select id="getUserTaskCount" resultType="java.lang.Integer">
+        select count(*) from task a LEFT JOIN project b ON a.project_id = b.project_id
+        LEFT JOIN project_file c on a.project_id = c.project_id
+        <where>1=1</where>
+        and a.is_del = 0
+        <if test="userId != null">
+            and a.user_id = #{userId}
+        </if>
+        <if test="userIds != null">
+            and a.user_id in (#{userIds})
+        </if>
+        <if test="status != null">
+            and a.`status` = #{status}
+        </if>
+    </select>
+
+
+</mapper>

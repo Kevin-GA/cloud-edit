@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.newtranx.task.mapper.TeamUserMapper">
+
+	<select id="selectTeamUser"  resultType="com.newtranx.task.dto.TeamUserR">
+		SELECT
+			r.role_name,
+			u.nick_name
+		FROM
+			task t
+			 join project p ON t.project_id = p.project_id
+			 join team tm ON p.team_id = tm.id
+			 join team_user tu ON tu.team_id = tm.id and tu.user_id in (SELECT t.user_id from task t)
+			 join user u ON u.user_id = tu.user_id
+			 join role r ON tu.role_id = r.role_id
+			 where 1=1
+			<if test="teamId!=null and teamId!=''"><!-- 根据团队ID过滤 -->
+				and tm.id = #{teamId}
+			</if>
+		GROUP BY
+			u.nick_name,
+			r.role_name
+			ORDER BY  r.role_name desc
+	</select>
+	<select id="selectTeamUserByTeamId" resultType="com.newtranx.task.dto.TeamUser">
+		select * from team_user where 1=1
+		<if test="teamId!=null and teamId!=''"><!-- 根据团队ID过滤 -->
+		   and tm.id = #{teamId}
+	    </if>
+	</select>
+</mapper>

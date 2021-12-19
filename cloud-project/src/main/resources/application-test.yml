@@ -1,0 +1,56 @@
+server:
+  port: 8006
+  servlet:
+    context-path: /project
+
+#设置feign客户端超时时间(OpenFeign默认支持ribbon)
+ribbon:
+#  #指的是建立连接所用的时间，适用于网络状况正常的情况下,两端连接所用的时间
+  ReadTimeout: 60000
+#  #指的是建立连接后从服务器读取到可用资源所用的时间
+  ConnectTimeout: 60000
+
+feign:
+  compression:
+    request:
+      min-request-size: 204800
+      enabled: true
+
+spring:
+  application:
+    name: project-service1
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 123.57.180.198:8848
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://123.57.180.198:3306/cloud_edit?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false
+    username: cloud_edit
+    password: xykj2015
+#  data:
+#    mongodb:
+#      uri: mongodb://admin:pass%40123!@123.57.180.198:27017/cat?authSource=admin&authMechanism=SCRAM-SHA-1
+
+  main:
+    allow-bean-definition-overriding: true
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/*.xml
+  type-aliases-package: com.newtranx.cloud.edit.entities
+  type-enums-package: com.newtranx.cloud.edit.enums
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+doc:
+  api:
+    baseAPIURL: http://123.57.180.198:8732/doc/
+    split: split
+    geneng: geneng
+    genchieng: genchieng
+
+file:
+  savePath: /Users/guolei/Downloads/

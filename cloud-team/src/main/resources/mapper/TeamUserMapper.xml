@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.newtranx.cloud.edit.dao.TeamUserMapper">
+
+    <resultMap id="teamUserList" type="com.newtranx.cloud.edit.dto.TeamUserListDto">
+        <result column="id" property="id"/>
+        <result column="team_id" property="teamId"/>
+        <result column="user_id" property="userId"/>
+        <result column="mobile" property="mobile" />
+        <result column="nick_name" property="nickName" />
+        <result column="job_type" property="jobType"/>
+        <result column="role_id" property="roleId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_del" property="isDel"/>
+    </resultMap>
+
+    <select id="getTeamUserList" resultMap="teamUserList">
+        SELECT * FROM team_user a LEFT JOIN user b ON a.user_id = b.user_id
+        <where>1=1</where>
+        and a.is_del = 0
+        <if test="jobType != null">
+            and a.job_type = #{jobType}
+        </if>
+        <if test="teamId != null">
+            and a.team_id = #{teamId}
+        </if>
+        limit ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <resultMap id="TeamUserResultMap" type="com.newtranx.cloud.edit.entities.TeamUserPlus">
+        <result column="team_id" property="teamId"/>
+        <result column="user_id" property="userId"/>
+        <result column="mobile" property="mobile"/>
+        <result column="nick_name" property="nickName"/>
+        <collection property="jobTypeRoles" ofType="com.newtranx.cloud.edit.entities.JobTypeRole">
+            <result column="job_type" property="jobType"/>
+            <result column="role_id" property="roleId"/>
+            <result column="role_code" property="roleCode"/>
+            <result column="role_name" property="roleName"/>
+        </collection>
+    </resultMap>
+
+    <select id="getTeamUserByTeamId" resultType="com.newtranx.cloud.edit.entities.TeamUserPlus" resultMap="TeamUserResultMap">
+        select tu.team_id, tu.user_id, u.mobile, u.nick_name,
+               tu.job_type, tu.role_id, r.role_code, r.role_name
+        from team_user tu left join user u on tu.user_id = u.user_id
+                          left join role r on tu.role_id = r.role_id
+        where tu.team_id = #{teamId} and tu.is_del = 0
+        <if test="jobType != null">
+            and tu.job_type = #{jobType}
+        </if>
+        ORDER BY tu.create_time desc
+        limit ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <select id="countTeamUserByTeamId" resultType="java.lang.Integer">
+        select count(DISTINCT tu.user_id)
+        from team_user tu left join user u on tu.user_id = u.user_id
+                          left join role r on tu.role_id = r.role_id
+        where tu.team_id = #{teamId} and tu.is_del = 0
+        <if test="jobType != null">
+            and tu.job_type = #{jobType}
+        </if>
+    </select>
+
+</mapper>

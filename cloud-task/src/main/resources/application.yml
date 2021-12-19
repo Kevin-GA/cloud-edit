@@ -1,0 +1,54 @@
+
+server:
+  port: 9002
+# 配置日志
+spring:
+  # 设置开发环境
+  profiles:
+    active: dev
+  application:
+    name: task-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 123.57.180.198:8848 #Nacos服务注册中心地址123.57.180.198
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://123.57.180.198:3306/cloud_edit?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false
+    username: cloud_edit
+    password: xykj2015
+
+  main:
+    allow-bean-definition-overriding: true
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/*.xml
+  type-aliases-package: com.newtranx.cloud.edit.entities
+  # 配置日志
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+swagger:
+  enabled: true
+  author: newtranx
+  title: '智能编辑平台'
+  desc: '智能编辑平台'
+  version: v2.0
+  termsOfServiceUrl: http://www.newtranx.com
+  host: 127.0.0.1:9999
+  authUri: http://127.0.0.1:9999/auth/oauth/token
+security:
+  oauth2:
+    resource:
+      jwt:
+        key-uri: http://123.57.180.198:7002/oauth/token_key
+    client:
+      client-id: client_3
+      client-secret: 123456
+      access-token-uri: http://123.57.180.198:7002/oauth/token
+      grant-type: password
+      scope: edit
+      user-authorization-uri: http://123.57.180.198:7002/oauth/authorize
+

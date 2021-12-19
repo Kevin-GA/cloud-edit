@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.newtranx.cloud.edit.dao.TaskDao">
+
+    <resultMap id="BaseResultMap" type="com.newtranx.cloud.edit.entities.Task">
+        <id column="task_id" property="taskId" />
+        <id column="project_id" property="projectId" />
+        <id column="file_id" property="fileId" />
+        <id column="user_id" property="userId" />
+        <id column="user_name" property="userName" />
+        <id column="type" property="type" />
+        <id column="due_time" property="dueTime" />
+        <id column="status" property="status" />
+        <id column="progress" property="progress" />
+        <id column="handled_count" property="handledCount" />
+        <id column="tatal_count" property="tatalCount" />
+        <id column="create_time" property="createTime" />
+        <id column="update_time" property="updateTime" />
+        <id column="is_del" property="isDel" />
+    </resultMap>
+
+    <sql id="tableName">`task`</sql>
+
+    <insert id="create" parameterType="com.newtranx.cloud.edit.entities.Task" useGeneratedKeys="true" keyProperty="taskId">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.taskId != null">`task_id`,</if>
+            <if test="entity.projectId != null">`project_id`,</if>
+            <if test="entity.fileId != null">`file_id`,</if>
+            <if test="entity.userId != null">`user_id`,</if>
+            <if test="entity.type != null">`type`,</if>
+            <if test="entity.dueTime != null">`due_time`,</if>
+            <if test="entity.status != null">`status`,</if>
+            <if test="entity.progress != null">`progress`,</if>
+            <if test="entity.handledCount != null">`handled_count`,</if>
+            <if test="entity.tatalCount != null">`tatal_count`,</if>
+            <if test="entity.createTime != null">`create_time`,</if>
+            <if test="entity.updateTime != null">`update_time`,</if>
+            <if test="entity.isDel != null">`is_del`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.taskId != null">#{entity.taskId},</if>
+            <if test="entity.projectId != null">#{entity.projectId},</if>
+            <if test="entity.fileId != null">#{entity.fileId},</if>
+            <if test="entity.userId != null">#{entity.userId},</if>
+            <if test="entity.type != null">#{entity.type},</if>
+            <if test="entity.dueTime != null">#{entity.dueTime},</if>
+            <if test="entity.status != null">#{entity.status},</if>
+            <if test="entity.progress != null">#{entity.progress},</if>
+            <if test="entity.handledCount != null">#{entity.handledCount},</if>
+            <if test="entity.tatalCount != null">#{entity.tatalCount},</if>
+
+            <if test="entity.createTime != null">#{entity.createTime},</if>
+            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+            <if test="entity.isDel != null">#{entity.isDel},</if>
+        </trim>
+    </insert>
+
+<!--    <update id="update">-->
+<!--        UPDATE <include refid="tableName"/>-->
+<!--        <set>-->
+<!--            <if test="entity.taskId != null">-->
+<!--                `task_id` = #{entity.taskId},-->
+<!--            </if>-->
+<!--            <if test="entity.projectId != null">-->
+<!--                `project_id` = #{entity.projectId},-->
+<!--            </if>-->
+<!--            <if test="entity.fileId != null">-->
+<!--                `file_id` = #{entity.fileId},-->
+<!--            </if>-->
+<!--            <if test="entity.userId != null">-->
+<!--                `user_id` = #{entity.createTime},-->
+<!--            </if>-->
+<!--            <if test="entity.type != null">-->
+<!--                `type` = #{entity.createTime},-->
+<!--            </if>-->
+<!--            <if test="entity.dueTime != null">-->
+<!--                `due_time` = #{entity.createTime},-->
+<!--            </if>-->
+<!--            <if test="entity.status != null">-->
+<!--                `status` = #{entity.createTime},-->
+<!--            </if>-->
+<!--            <if test="entity.progress != null">-->
+<!--                `progress` = #{entity.createTime},-->
+<!--            </if>-->
+<!--            <if test="entity.handledCount != null">-->
+<!--                `handled_count` = #{entity.createTime},-->
+<!--            </if>-->
+<!--            <if test="entity.tatalCount != null">-->
+<!--                `tatal_count` = #{entity.createTime},-->
+<!--            </if>-->
+<!--            <if test="entity.createTime != null">-->
+<!--                `create_time` = #{entity.createTime},-->
+<!--            </if>-->
+<!--            <if test="entity.updateTime != null">-->
+<!--                `updat_time` = #{entity.updateTime},-->
+<!--            </if>-->
+<!--            <if test="entity.isDel != null">-->
+<!--                `is_del` = #{entity.isDel},-->
+<!--            </if>-->
+<!--        </set>-->
+<!--        where `task_id` = #{entity.taskId};-->
+<!--    </update>-->
+
+
+    <select id="getTasksByFileId" parameterType="long" resultMap="BaseResultMap">
+        select t.* ,u.username as user_name
+        from `task` t left join `user` u on t.user_id = u.user_id
+        where t.file_id = #{fileId} and t.is_del = 0
+    </select>
+
+    <select id="getTasksByFileIds" resultType="com.newtranx.cloud.edit.entities.Task">
+        select * from <include refid="tableName"/>
+        where is_del = 0
+        and file_id in
+        <foreach collection="list" item="item"  open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+    <!-- 根据project_id查询用户-->
+    <select id="getTasksString" parameterType="long" resultType="string">
+        select
+        CASE
+        WHEN `type`= 1 THEN '翻译'
+        WHEN `type`= 2 THEN '编辑'
+        WHEN `type`= 3 THEN '校对'
+        ELSE
+        '未定义'
+        END
+        from <include refid="tableName"/>
+        where file_id = #{fileId} and is_del = 0
+
+    </select>
+
+    <select id="getSumTasks" resultType="com.newtranx.cloud.edit.entities.Task">
+        select project_id,file_id,`type`, sum(handled_count) as handled_count, sum(tatal_count) as tatal_count
+        from task
+        where  is_del = 0
+        <if test="projectId != null">
+            and project_id = #{projectId}
+        </if>
+        <if test="list != null and list.size() > 0">
+        and file_id in
+            <foreach collection="list" item="item"  open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        group by project_id,file_id,`type`
+
+    </select>
+
+</mapper>
+
+

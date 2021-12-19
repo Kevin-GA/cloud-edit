@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.newtranx.cloud.edit.dao.UserDao">
+
+    <resultMap id="BaseResultMap" type="com.newtranx.cloud.edit.entities.User">
+        <id column="user_id" property="userId" />
+        <id column="username" property="username" />
+        <id column="password" property="password" />
+        <id column="mobile" property="mobile" />
+        <id column="nick_name" property="nickName" />
+        <id column="login_time" property="loginTime" />
+        <id column="last_login_time" property="lastLoginTime" />
+        <id column="count" property="count" />
+        <id column="create_time" property="createTime" />
+        <id column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="tableName">`user`</sql>
+
+    <!--根据项目ID查询关联文件-->
+    <select id="getUserByProjectId" parameterType="long" resultMap="BaseResultMap">
+
+        select * from <include refid="tableName"/>
+        where user_id
+        in (
+        select t.user_id from task t where project_id = #{projectId}
+        );
+    </select>
+
+    <!-- 根据project_id查询用户-->
+<!--    <select id="getTeamIdByUserId" parameterType="string" resultType="string">-->
+<!--        select * from-->
+<!--        team_user where user_id= #{projectId}-->
+<!--    </select>-->
+
+</mapper>
+
+
